@@ -199,14 +199,6 @@ class SearchService
         }
     }
 
-    protected function findTitleOfHtmlPage($html)
-    {
-        $crawler = new Crawler($html);
-        $title = $crawler->filter('head > title')->text();
-        unset($crawler);
-        return $title;
-    }
-
     public function getDomain()
     {
         return $this->domain;
