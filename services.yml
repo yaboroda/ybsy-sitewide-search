@@ -1,0 +1,8 @@
+
+parameters:
+#    parameter_name: value
+
+services:
+    searchService:
+        class: AppBundle\Service\SearchService
+        arguments: ["%kernel.root_dir%", "%search.domain%", "%search.proto%", "%search.selector%"]

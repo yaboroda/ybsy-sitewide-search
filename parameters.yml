@@ -1,0 +1,5 @@
+# This file is auto-generated during the composer install
+parameters:
+    search.domain: 'pkyar.ru'
+    search.proto: 'https'
+    search.selector: 'body .main .catalog-card'
