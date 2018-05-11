@@ -1,0 +1,1 @@
+This service download site with wget, remove all annesessery from files and then searching it with grep. It functional, just not organized. I will get it in order and write docs later.
