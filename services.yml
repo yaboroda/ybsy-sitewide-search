@@ -5,4 +5,4 @@ parameters:
 services:
     searchService:
         class: AppBundle\Service\SearchService
-        arguments: ["%kernel.root_dir%", "%search.domain%", "%search.proto%", "%search.selector%"]
+        arguments: ["%kernel.root_dir%", "%search.domain%", "%search.proto%", "%search.selector%", "%search.context_size%"]

@@ -3,3 +3,4 @@ parameters:
     search.domain: 'pkyar.ru'
     search.proto: 'https'
     search.selector: 'body .main .catalog-card'
+    search.context_size: 100

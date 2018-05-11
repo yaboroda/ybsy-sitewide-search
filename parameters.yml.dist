@@ -5,3 +5,4 @@ parameters:
     search.domain: ~
     search.proto: 'http'
     search.selector: 'body'
+    search.context_size: 100

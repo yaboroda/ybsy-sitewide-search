@@ -5,8 +5,6 @@ namespace AppBundle\Service;
 use Symfony\Component\Process\Process;
 use Symfony\Component\DomCrawler\Crawler;
 
-use AppBundle\Exception\SearchServiceException;
-
 class SearchService
 {
     protected $folder;
@@ -20,13 +18,14 @@ class SearchService
 
     protected $buffer;
 
-    public function __construct($kernelFolder, $domain, $proto='http', $contentSelector='')
+    public function __construct($kernelFolder, $domain, $proto='http', $contentSelector, $contextSize=100)
     {
         $this->domain = preg_replace('#^(http|https)\:\/\/#', '', $domain);
         $this->proto = $proto;
         $this->cacheFolder = $kernelFolder.'/../src/AppBundle/Resources/searchCache';
         $this->folder = $this->cacheFolder.'/'.$this->domain;
         $this->contentSelector = $contentSelector;
+        $this->contextSize = $contextSize;
     }
 
     public function rebuildIndex()
@@ -130,7 +129,7 @@ class SearchService
     {
         $search = trim($search, '\ \"\'');
         $output = $this->searchInFiles($search);
-        return $this->prepareLinksFromSearshOutput($output);
+        return $this->prepareLinksFromSearshOutput($output, $search);
     }
 
     protected function searchInFiles($search)
@@ -155,7 +154,7 @@ class SearchService
         return $process->getOutput();
     }
 
-    protected function prepareLinksFromSearshOutput($output)
+    protected function prepareLinksFromSearshOutput($output, $search='')
     {
         $data = array();
         foreach (explode("\n", $output) as $filename) {
@@ -165,7 +164,8 @@ class SearchService
             if(!empty($link)){
                 try{
                     $entry['link'] = $link;
-                    $entry['title'] = file($filename)[0];
+                    $entry['title'] = trim(file($filename)[0], "\ \n");
+                    $entry['context'] = $this->findSearchContext($filename, $search);
                     $data[] = $entry;
                 }catch(\Exception $e){
                     // dump($e->getMessage());
@@ -173,6 +173,30 @@ class SearchService
             }
         }
         return $data;
+    }
+
+    protected function findSearchContext($filename, $search)
+    {
+        if(empty($search)){
+            return '';
+        }
+
+        try{
+            $regex = sprintf('#.{1,%s}%s.{1,100}#iu', $this->contextSize, $search, $this->contextSize);
+            preg_match(
+                $regex,
+                file_get_contents($filename),
+                $matches
+            );
+            if($matches){
+                return trim($matches[0]);
+            }else{
+                return '';
+            }
+        }catch(\Exception $e){
+            // dump($e->getMessage());
+            return '';
+        }
     }
 
     protected function findTitleOfHtmlPage($html)
